@@ -1,5 +1,6 @@
 import os
 from lxml import etree
+import json
 
 
 def parse_xml_to_dict(xml):
@@ -34,3 +35,6 @@ with open(xml_path) as f:
 xml = etree.fromstring(xml_str)
 
 data = parse_xml_to_dict(xml)
+
+data = json.dumps(data, indent=4)
+print(data)
