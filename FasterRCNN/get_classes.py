@@ -1,7 +1,6 @@
 import json
 import os
 
-
 txt_path = '../VOC2012/ImageSets/Main'
 list_classes = os.listdir(txt_path)
 

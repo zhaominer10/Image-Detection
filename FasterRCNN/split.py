@@ -27,7 +27,7 @@ def main():
             train_files.append(file_name)
 
     try:
-        train_f = open("train.txt", "x")
+        train_f = open("train.txt", "x")  # x写模式，新建一个文件，如果该文件已存在则会报错
         val_f = open("val.txt", "x")
         train_f.write("\n".join(train_files))
         val_f.write("\n".join(val_files))
