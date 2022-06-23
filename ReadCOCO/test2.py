@@ -12,7 +12,6 @@ ids = list(sorted(coco.imgs.keys()))
 print('number of images: {}'.format(len(ids)))
 
 coco_classes = dict([(v['id'], v['name']) for k, v in coco.cats.items()])
-print('yes')
 
 for img_id in ids[:3]:
     # 单张图片的所有标注信息
