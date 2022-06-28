@@ -177,6 +177,14 @@ def compute_aspect_ratios(dataset, indices=None):
     return _compute_aspect_ratios_slow(dataset, indices)
 
 
+"""
+x：aspect_ratios，包含aspect_ratio的列表
+返回每个aspect_ratio对应在groups的索引
+其中groups为宽高比（width / height）在[0.5, 2]区间划分成N等份，或者以1为分界线的两个group (>1, or <1)
+在相同区间内的宽高比的图片属于相同的group
+"""
+
+
 def _quantize(x, bins):
     bins = copy.deepcopy(bins)
     bins = sorted(bins)
@@ -195,7 +203,7 @@ def create_aspect_ratio_groups(dataset, k=0):
     groups = _quantize(aspect_ratios, bins)
     # count number of elements per group
     # 统计每个区间的频次
-    counts = np.unique(groups, return_counts=True)[1]
+    counts = np.unique(groups, return_counts=True)[1]  # groups, counts
     fbins = [0] + bins + [np.inf]
     print("Using {} as bins for aspect ratio quantization".format(fbins))
     print("Count of instances per bin: {}".format(counts))
