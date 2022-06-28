@@ -117,48 +117,56 @@ class VOC2012DataSet(Dataset):
         data_width = int(data['size']['width'])
         return data_height, data_width
 
+    """
+    将数据集按batch大小打包，例如batch_size=8，包含8个元素，每个元素又分别包含1张图片和图片对应的图像信息(target)
+    collate_fn将batch中的元素，相同的内容打包在一起，即将8张图片放在一起，8个target信息放在一起，组合成一个tuple
+    """
+
+    @staticmethod
+    def collate_fn(batch):
+        return tuple(zip(*batch))
 
 # 验证VOC2012DataSet类
-import transforms
-from draw_box_utils import draw_objs
-from PIL import Image
-import json
-import matplotlib.pyplot as plt
-import torchvision.transforms as ts
-import random
-import numpy as np
-
-# read class_indict
-category_index = {}
-try:
-    json_file = open('./pascal_voc_classes.json', 'r')
-    class_dict = json.load(json_file)
-    category_index = {str(v): str(k) for k, v in class_dict.items()}
-except Exception as e:
-    print(e)
-    exit(-1)
-
-data_transform = {
-    "train": transforms.Compose([transforms.ToTensor(),
-                                 transforms.RandomHorizontalFlip(0.5)]),
-    "val": transforms.Compose([transforms.ToTensor()])
-}
-
-# load train data set
-train_data_set = VOC2012DataSet("../VOC2012", data_transform["train"], "train.txt")
-print(len(train_data_set))
-for index in random.sample(range(0, len(train_data_set)), k=5):
-    img, target = train_data_set[index]
-    # print(target["labels"].numpy().shape[0])
-    img = ts.ToPILImage()(img)
-    plot_img = draw_objs(img,
-                         target["boxes"].numpy(),
-                         target["labels"].numpy(),
-                         np.ones(target["labels"].shape[0]),
-                         category_index=category_index,
-                         box_thresh=0.5,
-                         line_thickness=3,
-                         font='Inter-Regular.ttf',
-                         font_size=20)
-    plt.imshow(plot_img)
-    plt.show()
+# import transforms
+# from draw_box_utils import draw_objs
+# from PIL import Image
+# import json
+# import matplotlib.pyplot as plt
+# import torchvision.transforms as ts
+# import random
+# import numpy as np
+#
+# # read class_indict
+# category_index = {}
+# try:
+#     json_file = open('./pascal_voc_classes.json', 'r')
+#     class_dict = json.load(json_file)
+#     category_index = {str(v): str(k) for k, v in class_dict.items()}
+# except Exception as e:
+#     print(e)
+#     exit(-1)
+#
+# data_transform = {
+#     "train": transforms.Compose([transforms.ToTensor(),
+#                                  transforms.RandomHorizontalFlip(0.5)]),
+#     "val": transforms.Compose([transforms.ToTensor()])
+# }
+#
+# # load train data set
+# train_data_set = VOC2012DataSet("../VOC2012", data_transform["train"], "train.txt")
+# print(len(train_data_set))
+# for index in random.sample(range(0, len(train_data_set)), k=5):
+#     img, target = train_data_set[index]
+#     # print(target["labels"].numpy().shape[0])
+#     img = ts.ToPILImage()(img)
+#     plot_img = draw_objs(img,
+#                          target["boxes"].numpy(),
+#                          target["labels"].numpy(),
+#                          np.ones(target["labels"].shape[0]),
+#                          category_index=category_index,
+#                          box_thresh=0.5,
+#                          line_thickness=3,
+#                          font='Inter-Regular.ttf',
+#                          font_size=20)
+#     plt.imshow(plot_img)
+#     plt.show()
