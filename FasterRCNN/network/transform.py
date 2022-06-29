@@ -263,7 +263,7 @@ class GeneralizedRCNNTransform(nn.Module):
 
         # 记录resize后的图像尺寸
         image_sizes = [img.shape[-2:] for img in images]
-        images = self.batch_images(images)  # 将images打包成一个batch
+        images = self.batch_images(images)  # 将images打包成一个batch, type: Tensor
 
         # 定义image_sizes_list，类型为List[Tuple[int, int]]，初始值为[] (或许有点多余？)
         image_sizes_list = torch.jit.annotate(List[Tuple[int, int]], [])
@@ -272,7 +272,11 @@ class GeneralizedRCNNTransform(nn.Module):
             assert len(image_size) == 2
             image_sizes_list.append((image_size[0], image_size[1]))
 
-        image_list = ImageList(images, image_sizes_list)  # 将处理后的图像已经图像的长宽信息打包在一起
+        # 将处理后的图像已经图像的长宽信息打包在一起
+        # images 是batch images，长宽相同
+        # image_sizes_list 是图像normalize后，resize后，batch_image统一长宽之前的图像尺寸
+        # targets 是resize后的bbox信息
+        image_list = ImageList(images, image_sizes_list)
         return image_list, targets  # 即将输入到backbone的数据
 
 

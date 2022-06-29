@@ -5,7 +5,8 @@ import torch
 import torchvision
 
 import transforms
-# from network_files import FasterRCNN, AnchorsGenerator
+from network.rpn import AnchorsGenerator
+# import FasterRCNN,
 from backbone.mobilenetv2_model import MobileNetV2
 from backbone.vgg_model import vgg
 from my_dataset import VOC2012DataSet

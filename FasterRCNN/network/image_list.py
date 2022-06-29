@@ -18,7 +18,7 @@ class ImageList(object):
             image_sizes (list[tuple[int, int]])  padding前的图像尺寸
         """
         self.tensors = tensors
-        self.image_sizes = image_sizes
+        self.image_sizes = image_sizes  # 图片在GeneralizedRCNNTransform中缩放后的尺寸
 
     def to(self, device):
         # type: (Device) -> ImageList # noqa
