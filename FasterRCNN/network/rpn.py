@@ -5,8 +5,8 @@ from torch import nn, Tensor
 from torch.nn import functional as F
 import torchvision
 
-# from det_utils import det_utils
-# from boxes import boxes as box_ops
+import det_utils
+import boxes as box_ops
 from image_list import ImageList
 
 
@@ -113,6 +113,9 @@ class AnchorsGenerator(nn.Module):
         ]
         self.cell_anchors = cell_anchors
 
+    """
+    在每个预测特征层上设定的anchors的大小、比例种类（基础anchors的个数个数）可能不相同
+    """
     def num_anchors_per_location(self):
         # 计算每个预测特征层上每个滑动窗口的预测目标数
         return [len(s) * len(a) for s, a in zip(self.sizes, self.aspect_ratios)]
@@ -133,6 +136,8 @@ class AnchorsGenerator(nn.Module):
         assert cell_anchors is not None
 
         # 遍历每个预测特征层的grid_size，strides和cell_anchors
+        # 因为图像会以一个batch传入，因此图像可以看做是有相同的长宽
+        # 因此grid_size，strides和cell_anchors，在每个预测特征层有相对应的关系
         for size, stride, base_anchors in zip(grid_sizes, strides, cell_anchors):
             grid_height, grid_width = size
             stride_height, stride_width = stride
@@ -158,6 +163,7 @@ class AnchorsGenerator(nn.Module):
             # For every (base anchor, output anchor) pair,
             # offset each zero-centered base anchor by the center of the output anchor.
             # 将anchors模板与原图上的坐标偏移量相加得到原图上所有anchors的坐标信息(shape不同时会使用广播机制)
+            # 妙啊！！！！
             shifts_anchor = shifts.view(-1, 1, 4) + base_anchors.view(1, -1, 4)
             anchors.append(shifts_anchor.reshape(-1, 4))
 
@@ -211,12 +217,12 @@ class AnchorsGenerator(nn.Module):
         anchors = [torch.cat(anchors_per_image) for anchors_per_image in anchors]
         # Clear the cache in case that memory leaks.
         self._cache.clear()
-        return anchors
+        return anchors  # List[Tensor(num_anchors_of_each_image_in_all_feature_maps,4)] e.g., [800(14493, 4)]
 
 
 class RPNHead(nn.Module):
     """
-    add a RPN head with classification and regression
+    add an RPN head with classification and regression
     通过滑动窗口计算预测目标概率与bbox regression参数
     Arguments:
         in_channels: number of channels of the input feature
