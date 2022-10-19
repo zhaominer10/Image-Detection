@@ -20,3 +20,5 @@ classes = json.dumps(classes, indent=4)
 
 with open('pascal_voc_classes.json', 'w') as json_file:
     json_file.write(classes)
+
+print("hello")
